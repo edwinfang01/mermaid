@@ -3,4 +3,4 @@
 
 diagrama entidad relacion
 
-[idk](Diagramas/diflex_er_diagram.mermaid)
+![idk](Diagramas/diflex_er_diagram.mermaid)
