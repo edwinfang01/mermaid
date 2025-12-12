@@ -1,0 +1,297 @@
+erDiagram
+    USUARIO ||--o{ LOG_AUDITORIA : genera
+    USUARIO ||--o{ PEDIDO : crea
+    USUARIO }o--|| ROL : tiene
+    
+    CLIENTE ||--o{ PEDIDO : realiza
+    CLIENTE ||--o{ DEUDA : tiene
+    CLIENTE ||--o{ COBRO : paga
+    CLIENTE ||--|| RUTA : "asignado a"
+    
+    PEDIDO ||--o{ DETALLE_PEDIDO : contiene
+    PEDIDO ||--o| COTIZACION : "se genera de"
+    PEDIDO ||--|| FACTURA : "se convierte en"
+    PEDIDO ||--|| PICKING : "pasa a"
+    PEDIDO ||--|| INSPECCION : "pasa a"
+    PEDIDO ||--o{ DEVOLUCION : "puede tener"
+    
+    PRODUCTO ||--o{ DETALLE_PEDIDO : incluido_en
+    PRODUCTO ||--o{ DETALLE_COTIZACION : incluido_en
+    PRODUCTO ||--o{ DETALLE_DEVOLUCION : incluido_en
+    PRODUCTO ||--|| LINEA_PRODUCTO : pertenece_a
+    
+    COTIZACION ||--o{ DETALLE_COTIZACION : contiene
+    COTIZACION ||--|| GESTION_CAMBIOS : "pasa por"
+    
+    FACTURA ||--o{ COBRO : "genera"
+    FACTURA ||--o{ NOTA_CREDITO : "genera"
+    
+    DEVOLUCION ||--o{ DETALLE_DEVOLUCION : contiene
+    DEVOLUCION ||--|| NOTA_CREDITO : genera
+    
+    PICKING ||--|| TEMPORIZADOR_PICKING : tiene
+    INSPECCION ||--|| TEMPORIZADOR_INSPECCION : tiene
+    
+    DEPOSITO ||--|| USUARIO : "registrado por"
+    
+    USUARIO {
+        int id_usuario PK
+        string nombre
+        string username
+        string password
+        int id_rol FK
+        int id_sucursal FK
+        boolean activo
+        datetime fecha_creacion
+    }
+    
+    ROL {
+        int id_rol PK
+        string nombre_rol
+        string descripcion
+        boolean rep_ventas
+        boolean rep_servicio
+        boolean oficial_credito
+        boolean despachador
+        boolean oficial_inspeccion
+    }
+    
+    CLIENTE {
+        int id_cliente PK
+        string codigo_cliente
+        string nombre
+        string direccion
+        string telefono
+        boolean cliente_contado
+        decimal limite_credito
+        decimal balance_pendiente
+        int id_ruta FK
+        boolean activo
+        datetime fecha_creacion
+    }
+    
+    RUTA {
+        int id_ruta PK
+        string nombre_ruta
+        string descripcion
+        date fecha_ruta
+        boolean activa
+    }
+    
+    DEUDA {
+        int id_deuda PK
+        int id_cliente FK
+        int id_factura FK
+        decimal monto_deuda
+        decimal monto_pendiente
+        date fecha_vencimiento
+        string estado
+    }
+    
+    PRODUCTO {
+        int id_producto PK
+        string codigo_producto
+        string nombre
+        string descripcion
+        string codigo_barras
+        decimal precio_base
+        int id_linea FK
+        string estado
+        datetime fecha_creacion
+    }
+    
+    LINEA_PRODUCTO {
+        int id_linea PK
+        string nombre_linea
+        string descripcion
+        int orden
+    }
+    
+    COTIZACION {
+        int id_cotizacion PK
+        string numero_cotizacion
+        int id_cliente FK
+        int id_usuario FK
+        date fecha_cotizacion
+        date fecha_validez
+        decimal monto_total
+        string estado
+        boolean enviada_cliente
+        datetime fecha_envio
+        datetime fecha_creacion
+    }
+    
+    DETALLE_COTIZACION {
+        int id_detalle_cotizacion PK
+        int id_cotizacion FK
+        int id_producto FK
+        int cantidad
+        decimal precio_unitario
+        decimal descuento
+        decimal subtotal
+    }
+    
+    GESTION_CAMBIOS {
+        int id_gestion PK
+        int id_cotizacion FK
+        int id_usuario_solicita FK
+        int id_usuario_aprueba FK
+        string descripcion_cambio
+        string estado
+        datetime fecha_solicitud
+        datetime fecha_aprobacion
+    }
+    
+    PEDIDO {
+        int id_pedido PK
+        string numero_pedido
+        int id_cliente FK
+        int id_usuario FK
+        int id_cotizacion FK
+        date fecha_pedido
+        string tipo_pago
+        decimal monto_total
+        string estado
+        boolean es_credito
+        datetime fecha_creacion
+        datetime fecha_modificacion
+    }
+    
+    DETALLE_PEDIDO {
+        int id_detalle_pedido PK
+        int id_pedido FK
+        int id_producto FK
+        int cantidad
+        decimal precio_unitario
+        decimal descuento
+        decimal subtotal
+        int orden_original
+        int orden_picking
+    }
+    
+    FACTURA {
+        int id_factura PK
+        string numero_factura
+        int id_pedido FK
+        int id_cliente FK
+        date fecha_factura
+        decimal monto_total
+        decimal monto_pendiente
+        string estado
+        datetime fecha_creacion
+    }
+    
+    PICKING {
+        int id_picking PK
+        int id_pedido FK
+        int id_usuario FK
+        datetime fecha_inicio
+        datetime fecha_fin
+        int tiempo_segundos
+        string estado
+        datetime fecha_completado
+    }
+    
+    TEMPORIZADOR_PICKING {
+        int id_temporizador PK
+        int id_picking FK
+        int id_usuario FK
+        datetime hora_inicio
+        datetime hora_fin
+        int duracion_segundos
+    }
+    
+    INSPECCION {
+        int id_inspeccion PK
+        int id_pedido FK
+        int id_usuario FK
+        datetime fecha_inicio
+        datetime fecha_fin
+        int tiempo_segundos
+        string estado
+        datetime fecha_completado
+    }
+    
+    TEMPORIZADOR_INSPECCION {
+        int id_temporizador PK
+        int id_inspeccion FK
+        int id_usuario FK
+        datetime hora_inicio
+        datetime hora_fin
+        int duracion_segundos
+    }
+    
+    COBRO {
+        int id_cobro PK
+        string numero_cobro
+        int id_factura FK
+        int id_cliente FK
+        int id_usuario_registro FK
+        int id_usuario_aplica FK
+        decimal monto_cobro
+        string metodo_pago
+        string numero_referencia
+        date fecha_cobro
+        boolean aplicado
+        boolean validado
+        datetime fecha_aplicacion
+        datetime fecha_creacion
+    }
+    
+    DEPOSITO {
+        int id_deposito PK
+        int id_usuario FK
+        decimal monto_deposito
+        string banco
+        string numero_deposito
+        date fecha_deposito
+        datetime fecha_registro
+    }
+    
+    DEVOLUCION {
+        int id_devolucion PK
+        string numero_devolucion
+        int id_cliente FK
+        int id_factura FK
+        int id_usuario FK
+        date fecha_devolucion
+        string causa
+        boolean sin_factura
+        decimal monto_total
+        datetime fecha_creacion
+    }
+    
+    DETALLE_DEVOLUCION {
+        int id_detalle_devolucion PK
+        int id_devolucion FK
+        int id_producto FK
+        int cantidad
+        decimal precio_unitario
+        decimal subtotal
+        string motivo
+    }
+    
+    NOTA_CREDITO {
+        int id_nota_credito PK
+        string numero_nota
+        int id_devolucion FK
+        int id_factura FK
+        int id_cliente FK
+        decimal monto
+        date fecha_emision
+        string estado
+        datetime fecha_creacion
+    }
+    
+    LOG_AUDITORIA {
+        int id_log PK
+        int id_usuario FK
+        string modulo
+        string accion
+        string tabla_afectada
+        int id_registro
+        text datos_anteriores
+        text datos_nuevos
+        datetime fecha_hora
+        string ip_address
+    }
